@@ -1,0 +1,45 @@
+@font-face {
+    font-family: 'pocketMonk'; 
+    src: url('/static/build_team/PocketMonk-15ze.woff2') format('woff2'),
+    url('/static/build_team/PocketMonk-15ze.woff') format('woff'),
+    url('/static/build_team/PocketMonk-15ze.ttf') format('truetype');
+  }
+
+body {
+    margin: 120px 60px;
+    text-align: center;
+}
+
+h1 {
+    font-family: 'pocketMonk';
+    color:black;
+    font-size: 50px;
+}
+
+.row {
+    display: flex;
+    padding:40px;
+}
+
+.column {
+    width: 33%;
+    border: 1px solid;
+    margin: 15px;
+}
+
+.search_error {
+    margin: 20px;
+    font-size: 20px;
+}
+
+.poke_info_card {
+    display: block;
+}
+
+.info_bit {
+    margin: 5px;
+}
+
+#team_view {
+    margin: 30px;
+}

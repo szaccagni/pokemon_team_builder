@@ -1,0 +1,42 @@
+{% extends "build_team/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<div id="team_view">
+    <a href="{% url 'index' %}" >View Your Team</a>
+</div>
+
+<form action="{% url 'pokesearch' %}" method="get">
+    <input name="searched" type="text">
+    <button type="submit">search</button>
+</form>
+<div class="search_error">
+    {{error}}
+</div>
+{% if load_info_card %}
+<div class="poke_info_card">
+    <div class="info_bit"># {{poke_id}}</div>
+    <div class="info_bit"><img src={{sprite}}></div>
+    <div class="info_bit">
+        Type:
+        {%for type in types%}
+            {{type}} 
+        {% endfor %}
+    </div>
+    <div class="info_bit">Height: {{height}} ft</div>
+    <div class="info_bit">Weight: {{weight}} lb</div>
+    {%for ability in abilities%}
+    <div class="info_bit">
+        Ability: <b>{{ability.name}}</b>, {{ability.description}}
+    </div>
+    {% endfor %}
+    <div>{{location}}</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'build_team/main.js' %}"></script>
+{% endblock %}
