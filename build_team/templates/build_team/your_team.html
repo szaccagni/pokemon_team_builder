@@ -2,30 +2,77 @@
 {% load static %}
 
 {% block body %}
-<h1>Your Team!</h1>
 
-<div class="row">
-    <div class="column">
-        test
-    </div>
-    <div class="column">
-        test2
-    </div>
-    <div class="column">
-        test3
-    </div>
-    <div class="column">
-        test4
-    </div>
-    <div class="column">
-        test5
-    </div>
-    <div class="column">
-        test6
-    </div>
+<div>
+    You're playing : {{game}}
+    <br>
+    {{game.gen}}
+    <br>
+    Regions : {% for region in regions %} {{region}} {% endfor %}
 </div>
 
-<a id="edit_team" href="{% url 'buildteam' %}">Edit Your Team</a>
+{% if has_team %}
+<h1>Your Team!</h1>
+    <div class="team_row">
+        <div>
+            <div class="team_column">
+                <div class="info_bit"> # {{team.p1_id}} </div>
+                <div class="info_bit"> <img src="{{team.p1_sprite}}"> </div>
+                <div class="info_bit"> {{team.p1}} </div>
+            </div>
+            <a>remove</a>
+        </div>
+        <div class="team_column">
+            {% if team.p2 %}
+            <div class="info_bit"> # {{team.p2_id}} </div>
+            <div class="info_bit"> <img src="{{team.p2_sprite}}"> </div>
+            <div class="info_bit"> {{team.p2}} </div>
+            {% endif %}
+        </div>
+        <div class="team_column">
+            {% if team.p3 %}
+            <div class="info_bit"> # {{team.p3_id}} </div>
+            <div class="info_bit"> <img src="{{team.p3_sprite}}"> </div>
+            <div class="info_bit"> {{team.p3}} </div>
+            {% endif %}
+        </div>
+        <div class="team_column">
+            {% if team.p4 %}
+            <div class="info_bit"> # {{team.p4_id}} </div>
+            <div class="info_bit"> <img src="{{team.p4_sprite}}"> </div>
+            <div class="info_bit"> {{team.p4}} </div>
+            {% endif %}
+        </div>
+        <div class="team_column">
+            {% if team.p5 %}
+            <div class="info_bit"> # {{team.p5_id}} </div>
+            <div class="info_bit"> <img src="{{team.p5_sprite}}"> </div>
+            <div class="info_bit"> {{team.p5}} </div>
+            {% endif %}
+        </div>
+        <div class="team_column">
+            {% if team.p6 %}
+            <div class="info_bit"> # {{team.p6_id}} </div>
+            <div class="info_bit"> <img src="{{team.p6_sprite}}"> </div>
+            <div class="info_bit"> {{team.p6}} </div>
+            {% endif %}
+        </div>
+    </div>
+{% else %} 
+    <h1>No Team Members Yet!</h1>
+{% endif %}
+
+<div class="team_buttons">
+    {% if team.p6 %}
+    {% else %}
+    <div>
+        <a id="edit_team" href="{% url 'buildteam' game %}">Add to Your Team</a>
+    </div>
+    {% endif %}
+    <div>
+        <a id="new_team" href="{% url 'index' %}">Start Over with a Different Game</a>
+    </div>
+</div>
 
 {% endblock %}
 

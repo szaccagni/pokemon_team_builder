@@ -3,11 +3,19 @@
 
 {% block body %}
 
-<div id="team_view">
-    <a href="{% url 'index' %}" >View Your Team</a>
+<div>
+    You're playing : {{game}}
+    <br>
+    {{game.gen}}
+    <br>
+    Regions : {% for region in regions %} {{region}} {% endfor %}
 </div>
 
-<form action="{% url 'pokesearch' %}" method="get">
+<div id="team_view">
+    <a href="{% url 'team' %}" >View Your Team</a>
+</div>
+
+<form action="{% url 'pokesearch' game%}" method="get">
     <input name="searched" type="text">
     <button type="submit">search</button>
 </form>
@@ -15,24 +23,43 @@
     {{error}}
 </div>
 {% if load_info_card %}
+
 <div class="poke_info_card">
+    {% if appears_in_cur_game %}
+    <form action="{% url 'pokeadd' pokemon game%}" method="get">
+        <button class="choose_u" type="submit">I Choose You, {{pokemon}}!</button>
+    </form>
+    {% else %}
+    <div class="not_available">
+        This pokemon is not availble in your current game!
+    </div>
+    {% endif %}
     <div class="info_bit"># {{poke_id}}</div>
     <div class="info_bit"><img src={{sprite}}></div>
-    <div class="info_bit">
-        Type:
-        {%for type in types%}
-            {{type}} 
-        {% endfor %}
+    <div class="basic_info">
+        <div class="info_bit">
+            Type:
+            {%for type in types%}
+                {{type}} 
+            {% endfor %}
+        </div>
+        <div class="info_bit">Height: {{height}} ft</div>
+        <div class="info_bit">Weight: {{weight}} lb</div>
     </div>
-    <div class="info_bit">Height: {{height}} ft</div>
-    <div class="info_bit">Weight: {{weight}} lb</div>
-    {%for ability in abilities%}
-    <div class="info_bit">
-        Ability: <b>{{ability.name}}</b>, {{ability.description}}
+    <div class="abilities">
+        <table class="abilities_tbl">
+            <th>Ability</th>
+            <th>Description</th>
+            {% for ability in abilities %}
+                <tr>
+                    <td class="col1">{{ability.name}}</td>
+                    <td class="col2">{{ability.description}}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
-    {% endfor %}
-    <div>{{location}}</div>
 </div>
+
 {% endif %}
 
 {% endblock %}

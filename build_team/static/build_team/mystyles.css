@@ -16,15 +16,35 @@ h1 {
     font-size: 50px;
 }
 
-.row {
+.home img {
+    width:30%;
+}
+.home_form{
+    display: block;
+}
+
+.form_item {
+    margin: 15px;
+}
+
+.team_row {
     display: flex;
     padding:40px;
 }
 
-.column {
+.team_column {
     width: 33%;
     border: 1px solid;
     margin: 15px;
+    display: block;
+}
+
+.team_buttons {
+    display: block;
+}
+
+.team_buttons div {
+    margin: 20px;
 }
 
 .search_error {
@@ -34,10 +54,60 @@ h1 {
 
 .poke_info_card {
     display: block;
+    width:70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.not_available {
+    background-color: rgba(239, 245, 82, .75);
+    margin: 15px;
+    font-size: 24px;
+}
+
+.choose_u {
+    font-size: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
 }
 
 .info_bit {
     margin: 5px;
+}
+
+.basic_info {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.abilities {
+    margin-top:20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.abilities_tbl {
+    border: 1px solid;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.abilities_tbl tr th {
+    border: 1px solid;
+}
+
+.abilities_tbl td {
+    border: 1px solid;
+}
+
+.col1 {
+    width:35%;
+}
+
+.col2 {
+    width:65%;
 }
 
 #team_view {

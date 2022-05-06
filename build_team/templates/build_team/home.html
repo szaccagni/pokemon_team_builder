@@ -1,0 +1,24 @@
+{% extends "build_team/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div class="home">
+    <img src="/static/build_team/Pikachu_home.png">
+
+    <form class="home_form" action="{% url 'team' %}" method="get">
+        <div class="form_item">
+            <label for="games">What game are you playing?</label>
+            <select name="games" id="games">
+            {% for game in games %}
+                <option value="{{game}}">{{game}}</option>
+            {% endfor %}
+            </select>
+        </div>
+        <div class="form_item">
+            <input type="submit" value="Let's Go!">
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

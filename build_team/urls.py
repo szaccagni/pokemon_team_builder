@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("buildteam", views.build_team, name="buildteam"),
-    path("poke_search", views.poke_search, name="pokesearch")
+    path("your_team", views.team, name="team"),
+    path("buildteam/<str:game>", views.build_team, name="buildteam"),
+    path("poke_search/<str:game>", views.poke_search, name="pokesearch"),
+    path("poke_add/<str:pokemon>/<str:game>", views.poke_add, name="pokeadd")
 ]
