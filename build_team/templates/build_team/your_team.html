@@ -14,13 +14,10 @@
 {% if has_team %}
 <h1>Your Team!</h1>
     <div class="team_row">
-        <div>
-            <div class="team_column">
-                <div class="info_bit"> # {{team.p1_id}} </div>
-                <div class="info_bit"> <img src="{{team.p1_sprite}}"> </div>
-                <div class="info_bit"> {{team.p1}} </div>
-            </div>
-            <a>remove</a>
+        <div class="team_column">
+            <div class="info_bit"> # {{team.p1_id}} </div>
+            <div class="info_bit"> <img src="{{team.p1_sprite}}"> </div>
+            <div class="info_bit"> {{team.p1}} </div>
         </div>
         <div class="team_column">
             {% if team.p2 %}

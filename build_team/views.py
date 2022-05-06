@@ -84,11 +84,16 @@ def poke_search(request,game):
 
 def poke_add(request, pokemon, game):
     # review this logic, it seems messy
+    
     # if you cant get the team
+    new_team_needed = False
     try:
         team = Team.objects.get(user_id='1',game=game)
     # create a new one
     except:    
+        new_team_needed = True
+
+    if new_team_needed:
         new_team = Team(
             user_id = '1',
             p1 = pokemon,
@@ -97,7 +102,7 @@ def poke_add(request, pokemon, game):
             game = game
         )
         new_team.save()
-    # update the team if we found it
+        team = new_team
     else:
         if not team.p2:
             team.p2 = pokemon
