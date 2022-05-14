@@ -1,9 +1,12 @@
+from unicodedata import name
 import requests
 from urllib import response
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from json import JSONDecodeError 
+import json
+
 
 from .models import Team
 
@@ -16,26 +19,49 @@ def index(request):
         'games' : games
     })
 
+class Team_Member:
+    def __init__(self,name,id,sprite):
+        self.name = name
+        self.id = id
+        self.sprite = sprite
+
+    def __repr__(self):
+        return self.name
+
+def create_team(user,game):
+    team = Team.objects.get(user_id=user,game=game)
+    your_team = []
+    poke_ids = team.pk_ids.split(",")
+    poke_ids.pop()
+    for id in poke_ids:
+        sprite = get_sprite(id)
+        name = get_poke_name(id)
+        new_member = Team_Member(name,id,sprite)
+        your_team.append(new_member)
+    return your_team
+
 # loads the page with your team complied for a specific game
-def team(request):
+def team_view(request):
     game = request.GET.get('games')
     game_data = create_games(game)
     try:
         team = Team.objects.get(user_id='1',game=game)
         has_team = True
+        your_team = create_team('1',game)
     except:
         has_team = False
-        team = ''
+        your_team = []
     return render(request, "build_team/your_team.html", {
         'game' : game_data[0], 
         'regions' : game_data[0].region,
         'has_team' : has_team,
-        'team' : team
+        'team' : your_team
     })
 
 # loads the page where you can search for pokemon to add to your team
 # pulls in the game data for the previously selected game
-def build_team(request, game):
+def build_team(request):
+    game = request.GET.get('games')
     game_data = create_games(game)
     return render(request, "build_team/build_team.html", {
         'game' : game_data[0], 
@@ -43,7 +69,8 @@ def build_team(request, game):
     })
 
 # loads various data regarding the pokemon you searched for
-def poke_search(request,game):
+def poke_search(request):
+    game = request.GET.get('games')
     game_data = create_games(game)
     search = request.GET.get('searched').lower()
     url = 'https://pokeapi.co/api/v2/pokemon/' + search
@@ -65,7 +92,9 @@ def poke_search(request,game):
         appears_in_cur_game = check_game(poke_dict['game_indices'],game)
     except (JSONDecodeError, KeyError):
         return render(request, "build_team/build_team.html", {
-            'error' : 'no results, check your spelling!'
+            'game' : game_data[0], 
+            'regions' : game_data[0].region,
+            'error' : 'no results, check your spelling!',
         })
     else:
         return render(request, "build_team/build_team.html", {
@@ -81,10 +110,15 @@ def poke_search(request,game):
             'game' : game_data[0], 
             'regions' : game_data[0].region 
     })
-
-def poke_add(request, pokemon, game):
-    # review this logic, it seems messy
     
+# adding to the pokemon ids string for this users team for this game
+def poke_add(request): 
+    # data = json.loads(request.body)
+    # pokemon = data.get("pokemon")
+    # game = data.get("game")
+    pokemon = request.GET.get('pokemon_chosen')
+    game = request.GET.get('games')
+
     # if you cant get the team
     new_team_needed = False
     try:
@@ -96,48 +130,28 @@ def poke_add(request, pokemon, game):
     if new_team_needed:
         new_team = Team(
             user_id = '1',
-            p1 = pokemon,
-            p1_id = get_poke_id(pokemon),
-            p1_sprite = get_sprite(pokemon),
-            game = game
+            pk_ids = str(get_poke_id(pokemon)) + ",",
+            pk_count = 1,
+            game = game,
         )
         new_team.save()
         team = new_team
     else:
-        if not team.p2:
-            team.p2 = pokemon
-            team.p2_id = get_poke_id(pokemon)
-            team.p2_sprite = get_sprite(pokemon)
-            team.save()
-        elif not team.p3:
-            team.p3 = pokemon
-            team.p3_id = get_poke_id(pokemon)
-            team.p3_sprite = get_sprite(pokemon)
-            team.save()
-        elif not team.p4:
-            team.p4 = pokemon
-            team.p4_id = get_poke_id(pokemon)
-            team.p4_sprite = get_sprite(pokemon)
-            team.save()
-        elif not team.p5:
-            team.p5 = pokemon
-            team.p5_id = get_poke_id(pokemon)
-            team.p5_sprite = get_sprite(pokemon)
-            team.save()  
-        elif not team.p6:
-            team.p6 = pokemon
-            team.p6_id = get_poke_id(pokemon)
-            team.p6_sprite = get_sprite(pokemon)
-            team.save()  
+        team.pk_ids += str(get_poke_id(pokemon)) + ","
+        team.pk_count += 1
+        team.save()
 
+    your_team = create_team('1',game)
     game_data = create_games(game)
-    return render(request, "build_team/your_team.html", {
-        'game' : game_data[0], 
-        'regions' : game_data[0].region,
-        'team' : team,
-        'has_team' : True
-    })
+    
+    return team_view(request)
 
+    # return render(request, "build_team/your_team.html", {
+    #     'game' : game_data[0], 
+    #     'regions' : game_data[0].region,
+    #     'team' : your_team,
+    #     'has_team' : True
+    # })
 
 # grabs the short description of an ability from the pokemon api   
 def ability_effect(url):
@@ -205,6 +219,7 @@ def check_game(game_dict, game):
             return True
     return False
 
+# either the pokemon name or id can be passed here and you will get the same result
 def get_sprite(pokemon):
     url = 'https://pokeapi.co/api/v2/pokemon/' + pokemon
     response = requests.get(url)
@@ -216,6 +231,7 @@ def get_sprite(pokemon):
         sprite = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201.png'
     return sprite
 
+
 def get_poke_id(pokemon):
     url = 'https://pokeapi.co/api/v2/pokemon/' + pokemon
     response = requests.get(url)
@@ -225,3 +241,14 @@ def get_poke_id(pokemon):
     except:
         poke_id = '0'
     return poke_id
+
+
+def get_poke_name(id):
+    url = 'https://pokeapi.co/api/v2/pokemon/' + id
+    response = requests.get(url)
+    try: 
+        poke_dict = response.json()
+        poke_name = poke_dict['name']
+    except:
+        poke_name = 'not found'
+    return poke_name

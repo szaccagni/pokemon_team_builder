@@ -12,10 +12,11 @@
 </div>
 
 <div id="team_view">
-    <a href="{% url 'team' %}" >View Your Team</a>
+    <a href="{% url 'team' %}?games={{game}}">View Your Team</a>
 </div>
 
-<form action="{% url 'pokesearch' game%}" method="get">
+<form action="{% url 'pokesearch' %}" method="get">
+    <input type="hidden" name="games" value="{{game}}">
     <input name="searched" type="text">
     <button type="submit">search</button>
 </form>
@@ -26,8 +27,10 @@
 
 <div class="poke_info_card">
     {% if appears_in_cur_game %}
-    <form action="{% url 'pokeadd' pokemon game%}" method="get">
-        <button class="choose_u" type="submit">I Choose You, {{pokemon}}!</button>
+    <form action="{% url 'pokeadd' %}">
+        <input type="hidden" name="games" id="games" value="{{game}}">
+        <input type="hidden" name ="pokemon_chosen" value="{{pokemon}}">
+        <button id="chosen" class="choose_u" type="submit">I Choose You, {{pokemon}}!</button>
     </form>
     {% else %}
     <div class="not_available">

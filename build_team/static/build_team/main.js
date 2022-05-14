@@ -1,32 +1,30 @@
+document.addEventListener('DOMContentLoaded', function() {
 
-// document.addEventListener('DOMContentLoaded', function() {
+    // listen for clicks
+    document.addEventListener('click', event => {
+        const element = event.target;
 
-//     // listen for clicks
-//     document.addEventListener('click', event => {
-//         const element = event.target;
-
-//         // check if click was to edit the team
-//         if (element.id ==='edit_team') {
-//             console.log('success')
-//         }
-
-//         // check if click was for search
-//         if (element.id ==='poke_search') {
-//             const search = document.querySelector("#searched").value;
-//             poke_search(search)
-//         }
-//     });
-// });
+        // check if click was for search
+        if (element.id ==='chosen') {
+            console.log('add')
+        }
+    });
+});
 
 
-// probably not going to use this 
-
-// function poke_search(pokemon) {
-//     fetch(`/poke_search/${pokemon}`, {
-//         method:"GET",
-//     })
-//     .then(response => response.json())
-//     .then(result => {
-//         console.log(result);
-//     });
-// }
+function poke_add() {
+    console.log('add2')
+    const pokemon = document.querySelector("#pokemon_chosen").value;
+    const game = document.querySelector("#games").value;
+    fetch(`/poke_add/`, {
+        method:"POST",
+        body: JSON.stringify({
+        pokemon:pokemon,
+        game:game
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+    });
+}
