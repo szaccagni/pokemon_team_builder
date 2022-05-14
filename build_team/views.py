@@ -43,6 +43,7 @@ def create_team(user,game):
 # loads the page with your team complied for a specific game
 def team_view(request):
     game = request.GET.get('games')
+    # game = request.POST['games']
     game_data = create_games(game)
     try:
         team = Team.objects.get(user_id='1',game=game)
@@ -116,8 +117,11 @@ def poke_add(request):
     # data = json.loads(request.body)
     # pokemon = data.get("pokemon")
     # game = data.get("game")
-    pokemon = request.GET.get('pokemon_chosen')
-    game = request.GET.get('games')
+    # pokemon = request.GET.get('pokemon_chosen')
+    # game = request.GET.get('games')
+
+    pokemon = request.POST['pokemon_chosen']
+    game = request.POST['games']
 
     # if you cant get the team
     new_team_needed = False
@@ -137,15 +141,24 @@ def poke_add(request):
         new_team.save()
         team = new_team
     else:
-        team.pk_ids += str(get_poke_id(pokemon)) + ","
-        team.pk_count += 1
-        team.save()
+        # grab id of the last pokemon added to the team
+        poke_ids = team.pk_ids.split(",")
+        poke_ids.pop()
+        last_added = poke_ids.pop()
+        # id of pokemon currently being added
+        adding = str(get_poke_id(pokemon))
 
-    your_team = create_team('1',game)
-    game_data = create_games(game)
-    
-    return team_view(request)
+        # check to make sure this pokemon was not just added
+        if last_added != adding:
+            team.pk_ids += adding + ","
+            team.pk_count += 1
+            team.save()
+            
+        return team_view(request)
 
+    # not currently using this 
+    # your_team = create_team('1',game)
+    # game_data = create_games(game)
     # return render(request, "build_team/your_team.html", {
     #     'game' : game_data[0], 
     #     'regions' : game_data[0].region,

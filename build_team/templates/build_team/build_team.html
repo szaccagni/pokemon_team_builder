@@ -27,9 +27,10 @@
 
 <div class="poke_info_card">
     {% if appears_in_cur_game %}
-    <form action="{% url 'pokeadd' %}">
+    <form action="{% url 'pokeadd' %}?games={{game}}" method="post">
+        {% csrf_token %}
         <input type="hidden" name="games" id="games" value="{{game}}">
-        <input type="hidden" name ="pokemon_chosen" value="{{pokemon}}">
+        <input type="hidden" name ="pokemon_chosen" id="pokemon_chosen" value="{{pokemon}}">
         <button id="chosen" class="choose_u" type="submit">I Choose You, {{pokemon}}!</button>
     </form>
     {% else %}
