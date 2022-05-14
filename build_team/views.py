@@ -41,7 +41,7 @@ def create_team(user,game):
     return your_team
 
 # loads the page with your team complied for a specific game
-def team_view(request):
+def team_view(request,error=''):
     game = request.GET.get('games')
     # game = request.POST['games']
     game_data = create_games(game)
@@ -53,6 +53,7 @@ def team_view(request):
         has_team = False
         your_team = []
     return render(request, "build_team/your_team.html", {
+        'error' : error,
         'game' : game_data[0], 
         'regions' : game_data[0].region,
         'has_team' : has_team,
@@ -165,6 +166,39 @@ def poke_add(request):
     #     'team' : your_team,
     #     'has_team' : True
     # })
+
+def poke_remove(request):
+    # data = json.loads(request.body)
+    # poke_id = data.get("poke_id")
+    # game = data.get("game")
+    poke_id = request.POST['poke_id']
+    game = request.POST['games']
+    try:
+        team = Team.objects.get(user_id='1',game=game)
+        error = ''
+    except:
+        error = 'error, please try again'
+        return team_view(request, error)
+    
+    if not error:
+        pk_ids = team.pk_ids
+        pk_ids_list = pk_ids.split(",")
+        pk_ids_list.pop()
+        # check to make sure they aren't reloading the page
+        if poke_id in pk_ids_list:
+            r_index = pk_ids_list.index(poke_id)
+            pk_ids_list.pop(r_index)
+            # new list of ids without the id that is being removed
+            pk_ids_str = ','.join(pk_ids_list) + ',' 
+
+            team.pk_ids = pk_ids_str
+            team.save()
+            
+            return team_view(request)
+        else:
+            return team_view(request)
+
+
 
 # grabs the short description of an ability from the pokemon api   
 def ability_effect(url):

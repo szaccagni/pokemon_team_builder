@@ -27,16 +27,29 @@ h1 {
     margin: 15px;
 }
 
+.error_red { 
+    background-color: rgba(238, 141, 106, 0.75);
+    margin: 15px;
+    font-size: 24px;
+}
+
 .team_row {
     display: flex;
     padding:40px;
 }
+.team_column_container {
+    display:block;
+    width: 33%;
+}
 
 .team_column {
-    width: 33%;
     border: 1px solid;
-    margin: 15px;
+    margin: 15px 15px 5px 15px;
     display: block;
+}
+
+#poke_remove {
+    font-size: 11px;
 }
 
 .team_buttons {

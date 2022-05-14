@@ -6,5 +6,6 @@ urlpatterns = [
     path("your_team", views.team_view, name="team"),
     path("buildteam", views.build_team, name="buildteam"),
     path("poke_search", views.poke_search, name="pokesearch"),
-    path("poke_add", views.poke_add, name="pokeadd")
+    path("poke_add", views.poke_add, name="pokeadd"),
+    path("poke_remove", views.poke_remove, name="pokeremove")
 ]

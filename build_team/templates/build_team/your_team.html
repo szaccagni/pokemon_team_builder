@@ -13,12 +13,26 @@
 
 {% if has_team %}
 <h1>Your Team!</h1>
+
+{% if error %}
+<div class="error_red">
+    {{error}}
+</div>
+{% endif %}
+
     <div class="team_row">
         {% for member in team %}
-            <div class="team_column">
-                <div class="info_bit"> # {{member.id}} </div>
-                <div class="info_bit"> <img src="{{member.sprite}}"> </div>
-                <div class="info_bit"> {{member}} </div>
+            <div class="team_column_container">
+                <div class="team_column">
+                    <div class="info_bit"> # {{member.id}} </div>
+                    <div class="info_bit"> <img src="{{member.sprite}}"> </div>
+                    <div class="info_bit"> {{member}} </div>
+                </div>
+                <form action="{% url 'pokeremove' %}?games={{game}}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="game" name="games" value="{{game}}">
+                    <button id="poke_id" name="poke_id" value="{{member.id}}">remove</button>
+                </form>
             </div>
         {% endfor %}
     </div>
