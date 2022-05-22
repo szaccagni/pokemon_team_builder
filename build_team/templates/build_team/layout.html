@@ -12,7 +12,18 @@
     {% endblock %}
 </head>
 <body>
-
+    <div style="display:flex">
+        <h4 style="align-self: flex-end; margin-left:auto; margin-right:5px;">welcome, {{user}}</h4>
+    </div>
+    <div class="nav_bar">
+        <div>
+            <div class="nav_item"><a href="{% url 'index' %}">switch games</a></div>
+            <div class="nav_item"><a href="{% url 'allTeams' %}">your teams</a></div>
+        </div>
+        <div>
+            <div class="nav_item" style="float:right"><a href="{% url 'logout' %}">logout</a></div>
+        </div>
+    </div>
     {% block body %}
     {% endblock %}
 

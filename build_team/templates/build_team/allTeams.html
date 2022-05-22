@@ -1,0 +1,11 @@
+{% extends 'build_team/layout.html' %}
+
+{% block body %} 
+
+<div class="teams_container">
+    {% for team in teams %}
+    <div><a href="{% url 'team' %}?games={{team.game}}" class="actual_team_link"><div class="teams_link"> click to view your <b>{{team.game.upper}}</b> team</div></a></div>
+    {% endfor %}
+</div>
+
+{% endblock %}

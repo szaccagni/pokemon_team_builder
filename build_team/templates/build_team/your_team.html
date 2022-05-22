@@ -41,14 +41,14 @@
 {% endif %}
 
 <div class="team_buttons">
-    {% if team.p6 %}
+    {% if team_count >= 6 %}
     {% else %}
     <div>
         <a id="edit_team" href="{% url 'buildteam' %}?games={{game}}">Add to Your Team</a>
     </div>
     {% endif %}
     <div>
-        <a id="new_team" href="{% url 'index' %}">Start Over with a Different Game</a>
+        <a id="edit_team" href="">Battle a gym leader with this team!</a>
     </div>
 </div>
 

@@ -1,22 +1,87 @@
-from unicodedata import name
 import requests
-from urllib import response
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
-from django.http import JsonResponse
 from json import JSONDecodeError 
-import json
-
-
 from .models import Team
+from django.contrib.auth.models import User
+from django.contrib.auth import login,authenticate,logout
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.db import IntegrityError
 
-# Create your views here.
+
+def verify_login(func):
+    def logged_in(request):
+        if request.user.is_authenticated:
+            return func(request)
+        else:
+            return redirect('login')
+    return logged_in
+
+
+def register(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        email = request.POST["email"]
+        first = request.POST["first_name"]
+        last = request.POST["last_name"]
+
+        # Ensure password matches confirmation
+        password = request.POST["password"]
+        confirmation = request.POST["confirmation"]
+        if password != confirmation:
+            return render(request, "build_team/register.html", {
+                "message": "Passwords must match."
+            })
+
+        # Attempt to create new user
+        try:
+            user = User.objects.create_user(username, email, password, first_name=first, last_name=last)
+            user.save()
+        except IntegrityError:
+            return render(request, "build_team/register.html", {
+                "message": "Username already taken."
+            })
+        login(request, user)
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "build_team/register.html")
+
+
+def login_view(request):
+    if request.method == "POST":
+        # Attempt to sign user in
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        # Check if authentication successful
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(request, "build_team/login.html", {
+                "message": "Invalid username and/or password."
+            })
+    else:
+        return render(request, "build_team/login.html")
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("login"))
+
 
 # loads the home page with a complete list of games currently uploaded to the pokemon api
+@verify_login
 def index(request):
     games = create_games()
     return render(request, "build_team/home.html", {
         'games' : games
+    })
+
+def allTeams(request):
+    teams = Team.objects.all().filter(user=request.user)
+    return render(request, 'build_team/allTeams.html', {
+        'teams' : teams
     })
 
 class Team_Member:
@@ -29,7 +94,7 @@ class Team_Member:
         return self.name
 
 def create_team(user,game):
-    team = Team.objects.get(user_id=user,game=game)
+    team = Team.objects.get(user=user,game=game)
     your_team = []
     poke_ids = team.pk_ids.split(",")
     poke_ids.pop()
@@ -41,27 +106,32 @@ def create_team(user,game):
     return your_team
 
 # loads the page with your team complied for a specific game
+@verify_login
 def team_view(request,error=''):
     game = request.GET.get('games')
     # game = request.POST['games']
     game_data = create_games(game)
     try:
-        team = Team.objects.get(user_id='1',game=game)
+        team = Team.objects.get(user=request.user,game=game)
         has_team = True
         your_team = create_team('1',game)
+        team_count = len(your_team)
     except:
         has_team = False
         your_team = []
+        team_count = 0
     return render(request, "build_team/your_team.html", {
         'error' : error,
         'game' : game_data[0], 
         'regions' : game_data[0].region,
         'has_team' : has_team,
-        'team' : your_team
+        'team' : your_team,
+        'team_count' : team_count
     })
 
 # loads the page where you can search for pokemon to add to your team
 # pulls in the game data for the previously selected game
+@verify_login
 def build_team(request):
     game = request.GET.get('games')
     game_data = create_games(game)
@@ -71,6 +141,7 @@ def build_team(request):
     })
 
 # loads various data regarding the pokemon you searched for
+@verify_login
 def poke_search(request):
     game = request.GET.get('games')
     game_data = create_games(game)
@@ -114,6 +185,7 @@ def poke_search(request):
     })
     
 # adding to the pokemon ids string for this users team for this game
+@verify_login
 def poke_add(request): 
     # data = json.loads(request.body)
     # pokemon = data.get("pokemon")
@@ -127,14 +199,14 @@ def poke_add(request):
     # if you cant get the team
     new_team_needed = False
     try:
-        team = Team.objects.get(user_id='1',game=game)
+        team = Team.objects.get(user=request.user,game=game)
     # create a new one
     except:    
         new_team_needed = True
 
     if new_team_needed:
         new_team = Team(
-            user_id = '1',
+            user = request.user,
             pk_ids = str(get_poke_id(pokemon)) + ",",
             pk_count = 1,
             game = game,
@@ -155,7 +227,7 @@ def poke_add(request):
             team.pk_count += 1
             team.save()
             
-        return team_view(request)
+    return team_view(request)
 
     # not currently using this 
     # your_team = create_team('1',game)
@@ -167,6 +239,7 @@ def poke_add(request):
     #     'has_team' : True
     # })
 
+@verify_login
 def poke_remove(request):
     # data = json.loads(request.body)
     # poke_id = data.get("poke_id")
@@ -174,7 +247,7 @@ def poke_remove(request):
     poke_id = request.POST['poke_id']
     game = request.POST['games']
     try:
-        team = Team.objects.get(user_id='1',game=game)
+        team = Team.objects.get(user=request.user,game=game)
         error = ''
     except:
         error = 'error, please try again'
