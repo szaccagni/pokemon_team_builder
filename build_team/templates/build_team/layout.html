@@ -17,11 +17,11 @@
     </div>
     <div class="nav_bar">
         <div>
-            <div class="nav_item"><a href="{% url 'index' %}">switch games</a></div>
-            <div class="nav_item"><a href="{% url 'allTeams' %}">your teams</a></div>
+            <a href="{% url 'index' %}"><div class="nav_item">switch games</div></a>
+            <a href="{% url 'allTeams' %}"><div class="nav_item">your teams</div></a>
         </div>
         <div>
-            <div class="nav_item" style="float:right"><a href="{% url 'logout' %}">logout</a></div>
+            <a href="{% url 'logout' %}"><div class="nav_item" style="float:right">logout</div></a>
         </div>
     </div>
     {% block body %}

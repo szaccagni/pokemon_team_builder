@@ -1,51 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // listen for clicks
-    document.addEventListener('click', event => {
-        const element = event.target;
-        // check if click was for add
-        if (element.id ==='chosen') {
-            console.log('add')
-        } 
-
-        // check if click was for remove
-        if (element.id === 'poke_remove') {
-            console.log('remove')
-        }
-
-    });
-});
-
-function poke_remove(elem) {
-    const poke_id = elem.value
-    const game = document.querySelector("#game").value;
-        fetch(`/poke_remove`, {
-            method:"POST",
-            body: JSON.stringify({
-            poke_id:poke_id,
-            game:game
-            })
+    // check for gym container
+    const gym_container = document.querySelector('.gym_container')
+    if (gym_container) {
+        document.querySelectorAll('.leader_box').forEach( function(leader) {
+            leader.onmouseover = () => {
+                const color = leader.querySelector('.leader_color');
+                console.log(color.innerHTML);
+                leader.style.backgroundColor = color.innerHTML;
+            }
+            leader.onmouseout = () => {
+                leader.style.backgroundColor = '';   
+            }
         })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-        });
-}
+    } 
 
-
-// function poke_add() {
-//     console.log('add2')
-//     const pokemon = document.querySelector("#pokemon_chosen").value;
-//     const game = document.querySelector("#games").value;
-//     fetch(`/poke_add/`, {
-//         method:"POST",
-//         body: JSON.stringify({
-//         pokemon:pokemon,
-//         game:game
-//         })
-//     })
-//     .then(response => response.json())
-//     .then(result => {
-//         console.log(result);
-//     });
-// }
+    // check for gym_info section
+    const gym_info = document.querySelector('.gym_info'); 
+    if (gym_info) {
+        gym_info.style.backgroundColor = gym_info.dataset.color;
+    }
+});

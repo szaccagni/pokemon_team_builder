@@ -1,0 +1,52 @@
+{% extends "build_team/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+{{error}}
+
+<div>
+    You're playing : {{game}}
+    <br>
+    {{game.gen}}
+    <br>
+    Regions : {% for region in regions %} {{region}} {% endfor %}
+</div>
+
+<a href="{% url 'team' %}?games={{game}}"><button class="view_team_button">view your <b>{{game}}</b> team</button></a>
+
+
+<div class="gym_container">
+    {% for gym in gyms %}
+    <a href="{% url 'battle' %}?games={{game}}&leader={{gym.leader}}" class="leader_box"><div>
+        <p>{{gym}}</p>
+        <p>{{gym.leader}}</p>
+        <div class="leader_color">{{gym.leader.color}}</div>
+    </div></a>
+    {% endfor %}
+</div>
+
+{% if leader %}
+
+    <div data-color={{leader.color}} class="gym_info">
+        <h1>{{leader.name}}'s Team</h1>
+        <div class="gym_container">
+            {% for member in team %}
+                <div class="gym_box">
+                    <div class="info_bit"> # {{member.id}} </div>
+                    <div class="info_bit"> <img src="{{member.sprite}}"> </div>
+                    <div class="info_bit"> {{member}} </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button>BATTLE!</button>
+    </div>
+
+
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'build_team/main.js' %}"></script>
+{% endblock %}

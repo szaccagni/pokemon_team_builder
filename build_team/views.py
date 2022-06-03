@@ -1,7 +1,7 @@
 import requests
 from django.shortcuts import redirect, render
 from json import JSONDecodeError 
-from .models import Team
+from .models import Team, Gym, Leader
 from django.contrib.auth.models import User
 from django.contrib.auth import login,authenticate,logout
 from django.urls import reverse
@@ -84,6 +84,7 @@ def allTeams(request):
         'teams' : teams
     })
 
+
 class Team_Member:
     def __init__(self,name,id,sprite):
         self.name = name
@@ -114,7 +115,7 @@ def team_view(request,error=''):
     try:
         team = Team.objects.get(user=request.user,game=game)
         has_team = True
-        your_team = create_team('1',game)
+        your_team = create_team(request.user,game)
         team_count = len(your_team)
     except:
         has_team = False
@@ -263,7 +264,7 @@ def poke_remove(request):
             pk_ids_list.pop(r_index)
             # new list of ids without the id that is being removed
             pk_ids_str = ','.join(pk_ids_list) + ',' 
-
+            team.pk_count -= 1
             team.pk_ids = pk_ids_str
             team.save()
             
@@ -372,3 +373,37 @@ def get_poke_name(id):
     except:
         poke_name = 'not found'
     return poke_name
+
+
+def battle(request):
+    game = request.GET.get('games')
+    game_data = create_games(game)
+    leader_name = request.GET.get('leader')
+    error = ''
+    team = []
+    try:
+        gyms = Gym.objects.all().filter(game=game.title())
+    except:
+        error = "there was an error"
+    
+    if not leader_name:
+        leader = ''
+    else:
+        leader = Leader.objects.get(name=leader_name)
+        gym = Gym.objects.get(game=game.title(),leader=leader)
+        poke_ids = gym.team.split(",")
+        poke_ids.pop()
+        for id in poke_ids:
+            sprite = get_sprite(id)
+            name = get_poke_name(id)
+            new_member = Team_Member(name,id,sprite)
+            team.append(new_member)
+
+    return render(request, 'build_team/gyms.html', {
+        'error' : error,
+        'gyms':gyms,
+        'game' : game_data[0], 
+        'regions' : game_data[0].region,
+        'leader':leader,
+        'team' : team
+    })
