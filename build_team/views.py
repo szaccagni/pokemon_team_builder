@@ -8,7 +8,8 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.db import IntegrityError
 
-
+# function to check that user is logged in
+# used via a decorator for more functions
 def verify_login(func):
     def logged_in(request):
         if request.user.is_authenticated:
@@ -78,13 +79,15 @@ def index(request):
         'games' : games
     })
 
+# grab all teams already created for a specific user
+@verify_login
 def allTeams(request):
     teams = Team.objects.all().filter(user=request.user)
     return render(request, 'build_team/allTeams.html', {
         'teams' : teams
     })
 
-
+# used to organize and store individual pokemon information pulled via api
 class Team_Member:
     def __init__(self,name,id,sprite):
         self.name = name
@@ -94,6 +97,8 @@ class Team_Member:
     def __repr__(self):
         return self.name
 
+# pull pokemon info for user or gym leader
+@verify_login
 def create_team(user,game):
     team = Team.objects.get(user=user,game=game)
     your_team = []
@@ -111,7 +116,6 @@ def create_team(user,game):
 def team_view(request,error=''):
     game_txt = request.GET.get('games')
     game = Game.objects.get(name=game_txt)
-    # game = request.POST['games']
     game_data = Game.objects.get(name=game)
     try:
         team = Team.objects.get(user=request.user,game=game)
@@ -223,6 +227,7 @@ def poke_add(request):
     return team_view(request)
 
 
+# remove a specific pokemon from a team
 @verify_login
 def poke_remove(request):
     poke_id = request.POST['poke_id']
@@ -310,7 +315,8 @@ def get_poke_name(id):
         poke_name = 'not found'
     return poke_name
 
-
+# load gym leader information for a specific game
+@verify_login
 def battle(request):
     game = request.GET.get('games')
     game_data = Game.objects.get(name=game)
@@ -344,7 +350,8 @@ def battle(request):
         'team' : team
     })
 
-
+# determin if a user's team would win against a specific gym leader
+@verify_login
 def battle_leader(request):
     game = request.GET.get('games')
     game_data = Game.objects.get(name=game)
