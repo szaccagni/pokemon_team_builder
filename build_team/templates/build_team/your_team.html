@@ -47,9 +47,11 @@
         <a id="edit_team" href="{% url 'buildteam' %}?games={{game}}">Add to Your Team</a>
     </div>
     {% endif %}
+    {% if has_team %}
     <div>
         <a href="{% url 'battle' %}?games={{game}}">Battle a gym leader with this team!</a>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}

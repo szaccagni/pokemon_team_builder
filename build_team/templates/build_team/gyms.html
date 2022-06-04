@@ -15,7 +15,7 @@
 
 <a href="{% url 'team' %}?games={{game}}"><button class="view_team_button">view your <b>{{game}}</b> team</button></a>
 
-
+{% if gyms %}
 <div class="gym_container">
     {% for gym in gyms %}
     <a href="{% url 'battle' %}?games={{game}}&leader={{gym.leader}}" class="leader_box"><div>
@@ -25,6 +25,12 @@
     </div></a>
     {% endfor %}
 </div>
+{% else %}
+<div class="no_gyms">
+    <div class="error_red">Gym Data is Missing!</div>
+    <img src="/static/build_team/pysduck.png">
+</div>
+{% endif %}
 
 {% if leader %}
 
