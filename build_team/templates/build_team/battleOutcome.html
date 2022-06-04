@@ -1,0 +1,26 @@
+{% extends "build_team/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<div>
+    You're playing : {{game}}
+    <br>
+    Regions : {{game.region}}
+    <br>
+    generation {{game.gen_roman}}
+</div>
+
+<h1>{{outcome}}</h1>
+<p>You are the {{outcome}} against {{leader}}</p>
+
+<div class="outcomeButtons">
+    <a href="{% url 'team' %}?games={{game}}"><button class="view_team_button">view your <b>{{game}}</b> team</button></a>
+    <a href="{% url 'battle' %}?games={{game}}"><button class="view_team_button">battle a different <b>{{game}}</b> gym leader</button></a>
+</div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'build_team/main.js' %}"></script>
+{% endblock %}

@@ -12,5 +12,6 @@ urlpatterns = [
     path("poke_search", views.poke_search, name="pokesearch"),
     path("poke_add", views.poke_add, name="pokeadd"),
     path("poke_remove", views.poke_remove, name="pokeremove"),
-    path("battle", views.battle, name="battle")
+    path("battle", views.battle, name="battle"),
+    path("battleLeader", views.battle_leader, name="battleLeader")
 ]

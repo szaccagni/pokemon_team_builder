@@ -1,7 +1,7 @@
 import requests
 from django.shortcuts import redirect, render
 from json import JSONDecodeError 
-from .models import Team, Gym, Leader
+from .models import Game, Team, Gym, Leader
 from django.contrib.auth.models import User
 from django.contrib.auth import login,authenticate,logout
 from django.urls import reverse
@@ -73,7 +73,7 @@ def logout_view(request):
 # loads the home page with a complete list of games currently uploaded to the pokemon api
 @verify_login
 def index(request):
-    games = create_games()
+    games = Game.objects.all()
     return render(request, "build_team/home.html", {
         'games' : games
     })
@@ -109,9 +109,10 @@ def create_team(user,game):
 # loads the page with your team complied for a specific game
 @verify_login
 def team_view(request,error=''):
-    game = request.GET.get('games')
+    game_txt = request.GET.get('games')
+    game = Game.objects.get(name=game_txt)
     # game = request.POST['games']
-    game_data = create_games(game)
+    game_data = Game.objects.get(name=game)
     try:
         team = Team.objects.get(user=request.user,game=game)
         has_team = True
@@ -123,8 +124,7 @@ def team_view(request,error=''):
         team_count = 0
     return render(request, "build_team/your_team.html", {
         'error' : error,
-        'game' : game_data[0], 
-        'regions' : game_data[0].region,
+        'game' : game_data, 
         'has_team' : has_team,
         'team' : your_team,
         'team_count' : team_count
@@ -135,17 +135,16 @@ def team_view(request,error=''):
 @verify_login
 def build_team(request):
     game = request.GET.get('games')
-    game_data = create_games(game)
+    game_data = Game.objects.get(name=game)
     return render(request, "build_team/build_team.html", {
-        'game' : game_data[0], 
-        'regions' : game_data[0].region  
+        'game' : game_data, 
     })
 
 # loads various data regarding the pokemon you searched for
 @verify_login
 def poke_search(request):
     game = request.GET.get('games')
-    game_data = create_games(game)
+    game_data = Game.objects.get(name=game)
     search = request.GET.get('searched').lower()
     url = 'https://pokeapi.co/api/v2/pokemon/' + search
     response = requests.get(url)
@@ -166,8 +165,7 @@ def poke_search(request):
         appears_in_cur_game = check_game(poke_dict['game_indices'],game)
     except (JSONDecodeError, KeyError):
         return render(request, "build_team/build_team.html", {
-            'game' : game_data[0], 
-            'regions' : game_data[0].region,
+            'game' : game_data,
             'error' : 'no results, check your spelling!',
         })
     else:
@@ -181,21 +179,15 @@ def poke_search(request):
             'weight' : weight,
             'abilities' : abilities,
             'appears_in_cur_game' : appears_in_cur_game,
-            'game' : game_data[0], 
-            'regions' : game_data[0].region 
+            'game' : game_data
     })
     
 # adding to the pokemon ids string for this users team for this game
 @verify_login
 def poke_add(request): 
-    # data = json.loads(request.body)
-    # pokemon = data.get("pokemon")
-    # game = data.get("game")
-    # pokemon = request.GET.get('pokemon_chosen')
-    # game = request.GET.get('games')
-
     pokemon = request.POST['pokemon_chosen']
-    game = request.POST['games']
+    game_txt = request.POST['games']
+    game = Game.objects.get(name=game_txt)
 
     # if you cant get the team
     new_team_needed = False
@@ -230,23 +222,12 @@ def poke_add(request):
             
     return team_view(request)
 
-    # not currently using this 
-    # your_team = create_team('1',game)
-    # game_data = create_games(game)
-    # return render(request, "build_team/your_team.html", {
-    #     'game' : game_data[0], 
-    #     'regions' : game_data[0].region,
-    #     'team' : your_team,
-    #     'has_team' : True
-    # })
 
 @verify_login
 def poke_remove(request):
-    # data = json.loads(request.body)
-    # poke_id = data.get("poke_id")
-    # game = data.get("game")
     poke_id = request.POST['poke_id']
-    game = request.POST['games']
+    game_txt = request.POST['games']
+    game = Game.objects.get(name=game_txt)
     try:
         team = Team.objects.get(user=request.user,game=game)
         error = ''
@@ -283,51 +264,6 @@ def ability_effect(url):
         if effect['language']['name'] == 'en':
             effect = effect['short_effect']
     return effect
-
-# store data related to the current game you are playing
-class Game:
-    def __init__(self, game, region, gen, url):
-        self.game = game
-        self.region = region
-        self.gen = gen
-        self.url = url
-
-    def __repr__(self):
-        return self.game
-
-# grab data for the game you are playing and store it in a Game object
-def create_games(game=''):
-    games = []
-    if not game:
-        url='https://pokeapi.co/api/v2/version-group?limit=50'
-        response = requests.get(url)
-        versions_grp_dict = response.json()
-        results = versions_grp_dict['results']
-        version_grp_urls = []
-        for result in results:
-            version_grp_urls.append(result['url'])
-        for url in version_grp_urls:
-            response = requests.get(url)
-            vrsn_grp_dict = response.json()
-            regions = []
-            for region in vrsn_grp_dict['regions']:
-                regions.append(region['name'])
-            for version in vrsn_grp_dict['versions']:
-                new_game = Game(version['name'],regions,vrsn_grp_dict['generation']['name'],version['url'])
-                games.append(new_game)
-    else:
-        url='https://pokeapi.co/api/v2/version/' + game
-        response = requests.get(url)
-        version_dict = response.json()
-        vrsn_grp_url = version_dict['version_group']['url']
-        response = requests.get(vrsn_grp_url)
-        vrsn_grp_dict = response.json()
-        regions = []
-        for region in vrsn_grp_dict['regions']:
-            regions.append(region['name'])
-        new_game = Game(game, regions,vrsn_grp_dict['generation']['name'],vrsn_grp_url)
-        games.append(new_game)
-    return games
 
 # checks if the game you are playing appears in the list of games a particular pokemon appears in
 # you cannot add a pokemon to your team if they do not appear in the game you are playing
@@ -377,12 +313,13 @@ def get_poke_name(id):
 
 def battle(request):
     game = request.GET.get('games')
-    game_data = create_games(game)
+    game_data = Game.objects.get(name=game)
     leader_name = request.GET.get('leader')
     error = ''
     team = []
+    gyms = []
     try:
-        gyms = Gym.objects.all().filter(game=game.title())
+        gyms = Gym.objects.all().filter(game=game_data)
     except:
         error = "there was an error"
     
@@ -390,7 +327,7 @@ def battle(request):
         leader = ''
     else:
         leader = Leader.objects.get(name=leader_name)
-        gym = Gym.objects.get(game=game.title(),leader=leader)
+        gym = Gym.objects.get(game=game_data,leader=leader)
         poke_ids = gym.team.split(",")
         poke_ids.pop()
         for id in poke_ids:
@@ -402,8 +339,34 @@ def battle(request):
     return render(request, 'build_team/gyms.html', {
         'error' : error,
         'gyms':gyms,
-        'game' : game_data[0], 
-        'regions' : game_data[0].region,
+        'game' : game_data,
         'leader':leader,
         'team' : team
     })
+
+
+def battle_leader(request):
+    game = request.GET.get('games')
+    game_data = Game.objects.get(name=game)
+    leader_name = request.GET.get('leader')
+    leader = Leader.objects.get(name=leader_name)
+    gym = Gym.objects.get(leader=leader,game=game_data)
+    team = Team.objects.get(user=request.user,game=game_data)
+
+    # calc number of pokemon the gym leader has
+    gym_pk_count = gym.team.count(',')
+
+    # calc probably based on number of team members 
+    member_prob = ((team.pk_count - gym_pk_count) / team.pk_count) * 100
+
+    if member_prob > 50: 
+        outcome = 'winner'
+    else: 
+        outcome = 'looser'
+
+    return render(request, 'build_team/battleOutcome.html' , {
+        'outcome' : outcome,
+        'leader' : leader_name,        
+        'game' : game_data,
+    })
+    

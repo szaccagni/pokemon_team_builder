@@ -3,14 +3,14 @@
 
 {% block body %}
 
-{{error}}
+<div class="error_red">{{error}}</div>
 
 <div>
     You're playing : {{game}}
     <br>
-    {{game.gen}}
+    Regions : {{game.region}}
     <br>
-    Regions : {% for region in regions %} {{region}} {% endfor %}
+    generation {{game.gen_roman}}
 </div>
 
 <a href="{% url 'team' %}?games={{game}}"><button class="view_team_button">view your <b>{{game}}</b> team</button></a>
@@ -39,7 +39,7 @@
                 </div>
             {% endfor %}
         </div>
-        <button>BATTLE!</button>
+        <a href="{% url 'battleLeader' %}?games={{game}}&leader={{leader}}"><button>BATTLE!</button></a>
     </div>
 
 

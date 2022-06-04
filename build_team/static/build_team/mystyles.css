@@ -224,3 +224,7 @@ h1 {
 .view_team_button {
     margin: 20px;
 }
+
+.outcomeButtons a {
+    display: block;
+}
