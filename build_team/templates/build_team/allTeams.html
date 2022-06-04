@@ -1,11 +1,24 @@
 {% extends 'build_team/layout.html' %}
+{% load static %}
 
 {% block body %} 
 
 <div class="teams_container">
     {% for team in teams %}
-    <div><a href="{% url 'team' %}?games={{team.game}}" class="actual_team_link"><div class="teams_link"> click to view your <b>{{team.game.name.upper}}</b> team</div></a></div>
+    <div>
+        <a href="{% url 'team' %}?games={{team.game}}" class="actual_team_link">
+            <div class="teams_link"> 
+                click to view your <b>{{team.game.name.upper}}</b> team
+                <div class="team_color">{{team.game.color}}</div>
+            </div>
+        </a>
+    </div>
+
     {% endfor %}
 </div>
 
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'build_team/main.js' %}"></script>
 {% endblock %}

@@ -174,9 +174,13 @@ h1 {
     width:60%;
 }
 
+.team_color {
+    display:none;
+}
+/* 
 .teams_link:hover {
     background-color: rgba(235, 227, 89,.5);;
-}
+} */
 
 .actual_team_link {
     text-decoration: none;
