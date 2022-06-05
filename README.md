@@ -1,5 +1,5 @@
 # pokemon team builder
-This web app allows you to log in an create teams specific to any pokemon game and then assess their ability to beat that game's gym leaders. I have created this as the capstone project for CS50's Web Programming with Python and JavaScript. The project is ongoing and currently in development but is in a working state.
+This web app allows you to log in and create teams specific to any pokemon game and then assess their ability to beat that game's gym leaders. I have created this as the capstone project for CS50's Web Programming with Python and JavaScript. The project is ongoing and currently in development but is in a working state.
 
 ## Distinctiveness and Complexity
 This web app uses a combination of a restful API and SQLite database to load data. You can create a username, therefor your teams will only be accessible to you however the app can be utilized by many people. Once you have logged in you will pick a game and then build your team for that game. Search for pokemon to check if they are available in that game and receive basic info on that pokemon. If they are available and you would like to, you can add them to your team. You also have the option to remove pokemon from teams. Teams are capped at 6 pokemon (just like the game). 
