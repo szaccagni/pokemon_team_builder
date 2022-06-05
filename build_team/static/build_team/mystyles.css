@@ -240,7 +240,7 @@ h1 {
     }
 }
 
-@media only screen and (max-width: 500px) { 
+@media only screen and (max-width: 650px) { 
 
     body {
         margin: 10px 0; 

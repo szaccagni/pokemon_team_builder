@@ -98,7 +98,6 @@ class Team_Member:
         return self.name
 
 # pull pokemon info for user or gym leader
-@verify_login
 def create_team(user,game):
     team = Team.objects.get(user=user,game=game)
     your_team = []
@@ -116,7 +115,6 @@ def create_team(user,game):
 def team_view(request,error=''):
     game_txt = request.GET.get('games')
     game = Game.objects.get(name=game_txt)
-    game_data = Game.objects.get(name=game)
     try:
         team = Team.objects.get(user=request.user,game=game)
         has_team = True
@@ -128,7 +126,7 @@ def team_view(request,error=''):
         team_count = 0
     return render(request, "build_team/your_team.html", {
         'error' : error,
-        'game' : game_data, 
+        'game' : game, 
         'has_team' : has_team,
         'team' : your_team,
         'team_count' : team_count
